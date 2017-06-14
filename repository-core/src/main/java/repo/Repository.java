@@ -3,18 +3,12 @@ package repo;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Agnes_Rozsas
- */
 public class Repository {
 
     private Date creationDate;
     private AtomicLong counter;
     private String owner;
     private String id;
-
-    public Repository() {
-    }
 
     public Repository(final String id, final String owner) {
         this.creationDate = new Date();

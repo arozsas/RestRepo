@@ -2,9 +2,6 @@ package repo;
 
 import org.kohsuke.args4j.Option;
 
-/**
- * @author Agnes_Rozsas
- */
 public class RepoClientConfig {
 
     @Option(name = "--action")
