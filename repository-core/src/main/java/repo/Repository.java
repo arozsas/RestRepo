@@ -10,6 +10,9 @@ public class Repository {
     private String owner;
     private String id;
 
+    public Repository() {
+    }
+
     public Repository(final String id, final String owner) {
         this.creationDate = new Date();
         this.counter = new AtomicLong();
@@ -55,7 +58,7 @@ public class Repository {
 
     @Override
     public String toString() {
-        counter.incrementAndGet();
+//        counter.incrementAndGet();
         return "repo.Repository [creationDate=" + creationDate.toString() + ", counter=" + counter.toString() + ", id=" + id + ", owner=" + owner
             + "]";
     }

@@ -1,16 +1,13 @@
 package repo;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import repo.error.RepositoryConflictException;
+import repo.error.RepositoryNotFoundException;
+
+import java.util.List;
 
 @RestController
 public class RepositoryController {
@@ -19,25 +16,25 @@ public class RepositoryController {
     private RepositoryManager repositoryManager;
 
     @RequestMapping(value = "/repo", method = RequestMethod.POST)
-    public ResponseEntity<?> createRepository(@RequestBody Repository repository) {
+    public ResponseEntity<?> createRepository(@RequestBody Repository repository) throws RepositoryConflictException {
         ResponseEntity<?> responseEntity;
         if (!repositoryManager.repositoryExists(repository)) {
             repositoryManager.addRepository(repository);
             responseEntity = new ResponseEntity<Repository>(repository, HttpStatus.OK);
         } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new RepositoryConflictException(repository.getId());
         }
         return responseEntity;
     }
 
     @RequestMapping(value = "/repo", method = RequestMethod.GET)
-    public ResponseEntity<?> getRepo(@RequestParam("id") String id) {
+    public ResponseEntity<?> getRepo(@RequestParam("id") String id) throws RepositoryNotFoundException {
         ResponseEntity<?> responseEntity;
         Repository repository = repositoryManager.getRepository(id);
         if (repository != null) {
             responseEntity = new ResponseEntity<Repository>(repository, HttpStatus.OK);
         } else {
-            responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RepositoryNotFoundException(id);
         }
         return responseEntity;
     }
@@ -48,9 +45,21 @@ public class RepositoryController {
 //    }
 
 
-
     @RequestMapping(value = "/repos/getReposByCounter", method = RequestMethod.GET)
     public List<Repository> getRepoInfoByAccessCounter(@RequestParam("count") int count) {
         return repositoryManager.getRepoInfoByAccessCounter(count);
     }
+
+    @ExceptionHandler(RepositoryConflictException.class)
+    public ResponseEntity<RepositoryError> handleRepositoryConflictException(RepositoryConflictException e) {
+        RepositoryError error = new RepositoryError(HttpStatus.CONFLICT.toString(), "Repository with id: " + e.getRepositoryId() + " already exists!");
+        return new ResponseEntity<RepositoryError>(error, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(RepositoryNotFoundException.class)
+    public ResponseEntity<RepositoryError> handleRepositoryNotFoundException(RepositoryNotFoundException e) {
+        RepositoryError error = new RepositoryError(HttpStatus.NOT_FOUND.toString(), "Repository with id: " + e.getRepositoryId() + " does not exist!");
+        return new ResponseEntity<RepositoryError>(error, HttpStatus.OK);
+    }
+
 }

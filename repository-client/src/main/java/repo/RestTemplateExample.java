@@ -2,8 +2,8 @@ package repo;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,22 +21,22 @@ public class RestTemplateExample {
         RestTemplate restTemplate = new RestTemplate();
 
         if (repoClientConfig.getAction().equals("create")) {
-            Repository repository = new Repository(repoClientConfig.getId(), repoClientConfig.getOwner());
             try {
-                ResponseEntity<Repository> response = restTemplate.postForEntity(URI, repository, Repository.class);
-                System.out.println(response.getBody().toString());
-            } catch (HttpClientErrorException e) {
-                System.out.println(e.getStatusCode() + " " + e.getStatusText());
+                Repository repository = new Repository(repoClientConfig.getId(), repoClientConfig.getOwner());
+                RepositoryResponse response = restTemplate.postForObject(URI, repository, RepositoryResponse.class);
+                System.out.println(response.toString());
+            } catch (RestClientException | HttpMessageConversionException e) {
+                System.out.println(e.getMessage());
             }
         }
 
         if (repoClientConfig.getAction().equals("get")) {
             String getUrl = UriComponentsBuilder.fromUriString(URI).queryParam("id", repoClientConfig.getId()).build().toUriString();
             try {
-                ResponseEntity<Repository> response = restTemplate.getForEntity(getUrl, Repository.class, Collections.singletonMap("id", repoClientConfig.getId()));
-                System.out.println(response.getBody().toString());
-            } catch (HttpClientErrorException e) {
-                System.out.println(e.getStatusCode() + " " + e.getStatusText());
+                RepositoryResponse response = restTemplate.getForObject(getUrl, RepositoryResponse.class, Collections.singletonMap("id", repoClientConfig.getId()));
+                System.out.println(response.toString());
+            } catch (RestClientException | HttpMessageConversionException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
