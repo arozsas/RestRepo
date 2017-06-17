@@ -11,33 +11,28 @@ import java.util.Collections;
 
 public class RestTemplateExample {
 
-    private static final String URI = "http://localhost:8080/repo";
     private static RepoClientConfig repoClientConfig = new RepoClientConfig();
 
     public static void main(String[] args) {
 
         parseCmdLine(args);
 
-        RestTemplate restTemplate = new RestTemplate();
+        RepoClient repoClient = new RepoClient();
 
         if (repoClientConfig.getAction().equals("create")) {
-            try {
-                Repository repository = new Repository(repoClientConfig.getId(), repoClientConfig.getOwner());
-                RepositoryResponse response = restTemplate.postForObject(URI, repository, RepositoryResponse.class);
-                System.out.println(response.toString());
-            } catch (RestClientException | HttpMessageConversionException e) {
-                System.out.println(e.getMessage());
-            }
+            repoClient.createRepository(repoClientConfig.getId(), repoClientConfig.getOwner());
         }
 
         if (repoClientConfig.getAction().equals("get")) {
-            String getUrl = UriComponentsBuilder.fromUriString(URI).queryParam("id", repoClientConfig.getId()).build().toUriString();
-            try {
-                RepositoryResponse response = restTemplate.getForObject(getUrl, RepositoryResponse.class, Collections.singletonMap("id", repoClientConfig.getId()));
-                System.out.println(response.toString());
-            } catch (RestClientException | HttpMessageConversionException e) {
-                System.out.println(e.getMessage());
-            }
+            repoClient.getRepository(repoClientConfig.getId());
+        }
+
+        if (repoClientConfig.getAction().equals("delete")) {
+            repoClient.deleteRepository(repoClientConfig.getId());
+        }
+
+        if (repoClientConfig.getAction().equals("filter")) {
+            repoClient.getRepositoriesByCounter(repoClientConfig.getCount());
         }
     }
 

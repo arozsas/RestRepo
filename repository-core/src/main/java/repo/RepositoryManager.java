@@ -25,8 +25,8 @@ public class RepositoryManager {
         repositories.put(repository.getId(), repository);
     }
 
-    public void deleteRepository(final String repoName) {
-        Repository repository = repositories.remove(repoName);
+    public Repository deleteRepository(final String repoName) {
+        return repositories.remove(repoName);
     }
 
     public List<Repository> getRepoInfoByAccessCounter(final int accessCount) {

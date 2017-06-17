@@ -48,3 +48,4 @@ docker_config.yml
 docker-compose-filled.yml
 docker-compose.yml
 .log
+repository-client/dependency-reduced-pom.xml

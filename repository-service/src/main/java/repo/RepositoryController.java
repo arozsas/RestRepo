@@ -39,15 +39,21 @@ public class RepositoryController {
         return responseEntity;
     }
 
-//    @RequestMapping(value = "/repo", method = RequestMethod.DELETE)
-//    public String deleteRepository(@RequestParam("id") String id) {
-//        return repositoryManager.deleteRepository(id);
-//    }
+    @RequestMapping(value = "/repo", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteRepository(@RequestParam("id") String id) throws RepositoryNotFoundException {
+        ResponseEntity<?> responseEntity;
+        Repository repository = repositoryManager.deleteRepository(id);
+        if (repository != null) {
+            responseEntity = new ResponseEntity<Repository>(HttpStatus.OK);
+        } else {
+            throw new RepositoryNotFoundException(id);
+        }
+        return responseEntity;
+    }
 
-
-    @RequestMapping(value = "/repos/getReposByCounter", method = RequestMethod.GET)
-    public List<Repository> getRepoInfoByAccessCounter(@RequestParam("count") int count) {
-        return repositoryManager.getRepoInfoByAccessCounter(count);
+    @RequestMapping(value = "/repo/getReposByCounter", method = RequestMethod.GET)
+    public ResponseEntity<List<Repository>> getRepoInfoByAccessCounter(@RequestParam("count") int count) {
+        return new ResponseEntity<List<Repository>>(repositoryManager.getRepoInfoByAccessCounter(count), HttpStatus.OK);
     }
 
     @ExceptionHandler(RepositoryConflictException.class)
